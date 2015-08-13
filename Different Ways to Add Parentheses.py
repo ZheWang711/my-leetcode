@@ -6,13 +6,9 @@ group numbers and operators. The valid operators are +, - and *
 '''
 
 
-
-
-
 class Node:
-    def __init__(self, is_leaf=True, level=0, value=None, left=None, right=None, order_label=None, operator=None):
+    def __init__(self, is_leaf=True, value=None, left=None, right=None, order_label=None, operator=None):
         self.is_leaf = is_leaf
-        self.level = level     # level of integer is 0
         self.value = value
         self.left = left
         self.right = right
@@ -34,20 +30,6 @@ def print_expression(root):
         return string
 
 
-def min_label(root):
-    if root.is_leaf:
-        return float('inf')
-    else:
-        return min(root.order_label, min_label(root.left), min_label(root.right))
-
-
-def max_label(root):
-    if root.is_leaf:
-        return -float('inf')
-    else:
-        return max(root.order_label, min_label(root.left), min_label(root.right))
-
-
 def merge(t1, t2, operator, i):
     value = None
     if operator == '+':
@@ -56,12 +38,10 @@ def merge(t1, t2, operator, i):
         value = t1.value - t2.value
     if operator == '*':
         value = t1.value * t2.value
-    return Node(False, max(t1.level, t2.level) + 1, value, t1, t2, i, operator)
+    return Node(False, value, t1, t2, i, operator)
 
 
 # tree node list A, operator list B
-
-
 def driven(A, B, result, cur, ex_set):
     if len(A) == 1:
         ex = print_expression(A[0])
@@ -72,16 +52,15 @@ def driven(A, B, result, cur, ex_set):
         for i in range(len(B)):
             new_node = merge(A[i], A[i + 1], B[i], cur)
             if new_node.able_to_repeat() and new_node.left.order_label > new_node.right.order_label:
-            #if new_node.able_to_repeat() and max_label(new_node.left) > min_label(new_node.right):
                 continue
-
+            # progress
             del A[i]
             del A[i]
             tmp = B[i]
             del B[i]
             A.insert(i, new_node)
             driven(A, B, result, cur + 1, ex_set)
-
+            # recover global variables
             del A[i]
             A.insert(i, new_node.right)
             A.insert(i, new_node.left)
@@ -89,9 +68,9 @@ def driven(A, B, result, cur, ex_set):
 
 
 class Solution:
-    zero_cnt = 0
     # @param {string} input
     # @return {integer[]}
+
     def diffWaysToCompute(self, input):
         A = []
         B = []
