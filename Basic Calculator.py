@@ -1,5 +1,24 @@
 __author__ = 'WangZhe'
 import re
+import timeit
+
+
+class GlobalTimer:
+
+    def __init__(self, val):
+        self.value = val
+
+    def add(self, val):
+        self.value += val
+
+    def __str__(self):
+        return str(self.value)
+
+leaf_timer = GlobalTimer(0)
+total_timer = GlobalTimer(0)
+call_max_level_timer = GlobalTimer(0)
+loop_timer = GlobalTimer(0)
+
 
 opr_dict = {
     '+': lambda x, y: x + y,
@@ -41,14 +60,20 @@ def cal_max_level(s):
 
 
 def calculator(s):
+    start_call_max_level = timeit.default_timer()
     level_s = cal_max_level(s)
+    call_max_level_timer.add(timeit.default_timer() - start_call_max_level)
     if level_s == 0:
-        return leaf_expr(s)
+        start_time = timeit.default_timer()
+        result = leaf_expr(s)
+        leaf_timer.add(timeit.default_timer() - start_time)
+        return result
     base_opr = []
     base_left_pth = []
     base_right_pth = []
     level = 0
 
+    start_loop = timeit.default_timer()
     values = []
     i = 0
     while i < len(s):
@@ -59,7 +84,7 @@ def calculator(s):
             i -= 1
             high = i
             values.append(int(s[low: high + 1]))
-        if s[i] == '(':
+        elif s[i] == '(':
             level += 1
             if level == 1:
                 base_left_pth.append(i)
@@ -71,7 +96,7 @@ def calculator(s):
         elif not s[i].isdigit() and level == 0:
             base_opr.append(i)
         i += 1
-
+    loop_timer.add(timeit.default_timer() - start_loop)
     if len(base_opr) == 0:
         return calculator(s[1: -1])
     else:
@@ -93,7 +118,12 @@ class Solution:
 
 
     def calculate(self, s):
+        start = timeit.default_timer()
         s = delete_extra_spaces(s)
-        return calculator(s)
-
-print(Solution().calculate('(1+(4+5+2)-3)+(6+8)'))
+        result = calculator(s)
+        total_timer.add(timeit.default_timer() - start)
+        print('total time', total_timer)
+        print('leaf expression', leaf_timer)
+        print('calculate max level', call_max_level_timer)
+        print('loop time', loop_timer)
+        return result
