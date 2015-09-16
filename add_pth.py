@@ -42,7 +42,7 @@ class Solution:
         g = GenerateParenthesis(n)
         g.back_track(0,[])
         print(g.results)
-        return g.results
+        return list(g.results)
 
 
 
