@@ -20,7 +20,8 @@ class Solution(object):
             if current_window[s[j]] <= needs[s[j]]:
                 missing -= 1
             if missing == 0:
-                while i <= j and (needs.get(s[i]) is None or current_window[s[i]] > needs[s[i]]): # try outer condition
+                # the following while loop can be paced outside :if: condition, place here to improve performance
+                while i <= j and (needs.get(s[i]) is None or current_window[s[i]] > needs[s[i]]):
                     if needs.get(s[i]) is not None:
                         current_window[s[i]] -= 1
                     i += 1
