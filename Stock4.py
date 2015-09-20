@@ -32,33 +32,42 @@ class AI:
 
     def _decision(self, cur, k):
 
-        if cur == len(self.prices):
+        if cur == len(self.prices) or k >= self.max_k:
             if self.max_profit < self.person.profits:
                 self.max_profit = self.person.profits
                 self.action = self.A.copy()
             return
 
         if self.person.state == 0:
-            if k < self.max_k:
-                self.A[cur] = 'b'
-                self.person.buy(self.prices[cur])
-                self._decision(cur + 1, k)
-                self.person.sell(self.prices[cur])  # recover global variables
-
             # if the market is going to fall, not buy
             if cur + 1 < len(self.prices) and self.prices[cur] >= self.prices[cur + 1]:
                 self.A[cur] = 'h'
                 self._decision(cur + 1, k)
+
+            elif k < self.max_k:
+                self.A[cur] = 'h'
+                self._decision(cur + 1, k)
+                self.A[cur] = None
+                self.A[cur] = 'b'
+                self.person.buy(self.prices[cur])
+                self._decision(cur + 1, k)
+                self.person.sell(self.prices[cur])  # recover global variables
+                self.A[cur] = None
         else:
             # if the market is going to rise, not sell
             if cur + 1 < len(self.prices) and self.prices[cur] <= self.prices[cur + 1]:
                 self.A[cur] = 'h'
                 self._decision(cur + 1, k)
-
-            self.A[cur] = 's'
-            self.person.sell(self.prices[cur])
-            self._decision(cur + 1, k + 1)
-            self.person.buy(self.prices[cur])   # recover global variables
+                self.A[cur] = None
+            else:
+                self.A[cur] = 'h'
+                self._decision(cur + 1, k)
+                self.A[cur] = None
+                self.A[cur] = 's'
+                self.person.sell(self.prices[cur])
+                self._decision(cur + 1, k + 1)
+                self.person.buy(self.prices[cur])   # recover global variables
+                self.A[cur] = None
 
 class Solution:
 
@@ -70,5 +79,5 @@ class Solution:
 
 if __name__ == '__main__':
     a = Solution()
-    print(a.maxProfit(4, [1, 2, 3, 4, 3, 2, 3, 4, 5, 4]))
+    print(a.maxProfit(2, [1, 2, 3, 4, 3, 2, 3, 4, 5, 4]))
     print(a.record.action)
