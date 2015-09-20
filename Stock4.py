@@ -35,7 +35,7 @@ class AI:
         if cur == len(self.prices):
             if self.max_profit < self.person.profits:
                 self.max_profit = self.person.profits
-                self.action = self.A
+                self.action = self.A.copy()
             return
 
         if self.person.state == 0:
@@ -70,5 +70,5 @@ class Solution:
 
 if __name__ == '__main__':
     a = Solution()
-    print(a.maxProfit(76, [8,3,6,2,8,8,8,4,2,0,7,2,9,4,9]))
+    print(a.maxProfit(4, [1, 2, 3, 4, 3, 2, 3, 4, 5, 4]))
     print(a.record.action)
