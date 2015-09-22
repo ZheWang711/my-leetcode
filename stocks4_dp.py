@@ -22,56 +22,46 @@ class Solution:
             return 0
         V = []
         P = []
-        for i in range(length):
-            if i == 0 or i == length - 1:
-                if i == 0 and prices[i + 1] > prices[i]:
-                    V.append(i)
-                    self.to_be_V = False
-                elif i == 0 and prices[i + 1] < prices[i]:
-                    P.append(i)
-                    self.to_be_V = True
-                elif i == length - 1 and prices[i] < prices[i - 1]:
-                    V.append(i)
-                    self.to_be_V = False
-                elif i == length - 1 and prices[i] > prices[i - 1]:
-                    P.append(i)
-                    self.to_be_V = True
-            else:
-                if not self.to_be_V and (prices[i - 1] <= prices[i] > prices[i + 1] or prices[i - 1] < prices[i] >= prices[i + 1]):
-                    P.append(i)
-                    self.to_be_V = True
-                elif self.to_be_V and (prices[i - 1] >= prices[i] < prices[i + 1] or prices[i - 1] > prices[i] <= prices[i + 1]):
-                    V.append(i)
-                    self.to_be_V = False
-        if P[0] < V[0]:
-            del P[0]
-        if len(V) != len(P):
-            if len(V) > len(P):
-                del V[-1]
-            else:
-                del P[0]
+        p = v = 0
+        while p < length:
+            v = p
+            while v < length - 1 and prices[v] >= prices[v + 1]:
+                v += 1
+            V.append(v)
+            p = v + 1
+            while p < length and prices[p] >= prices[p - 1]:
+                p += 1
+            P.append(p - 1)
         return V, P
 
     def compute_max_profits(self, k, prices, V, P):
         if len(V) != len(P):
             raise ValueError('P, V different length')
         heap = []
-        buffer = None
         pairs_stack = []
         for i in range(len(V)):
-            pairs = V[i], P[i]
-            if len(pairs_stack) != 0 and prices[pairs[0]] >= prices[pairs_stack[-1][0]] and prices[pairs[1]] >= prices[pairs_stack[-1][1]]:
-                vi, pj = pairs_stack.pop()
-                buffer = prices[pairs[1]] - prices[vi]
-                heapq.heappush(heap, -(prices[pj] - prices[pairs[0]]))
-                pairs_stack.append((vi, pairs[1]))
+            v2, p2 = V[i], P[i]
+            while len(pairs_stack) != 0 and prices[v2] >= prices[pairs_stack[-1][0]] and prices[p2] >= prices[pairs_stack[-1][1]]:
+                v1, p1 = pairs_stack[-1]
+                heapq.heappush(heap, -(prices[p1] - prices[v2]))
+                v2 = v1
+                pairs_stack.pop()
+                while len(pairs_stack) != 0 and prices[v2] < prices[pairs_stack[-1][0]]:
+                    v1, p1 = pairs_stack.pop()
+                    heapq.heappush(heap, -(prices[p1] - prices[v1]))
 
-            else:
-                if buffer is not None:
-                    # heapq.heappush(heap, -buffer)
-                    buffer = None
-                # heapq.heappush(heap, -(pairs[1] - pairs[0]))
-                pairs_stack.append((pairs[0], pairs[1]))
+            while len(pairs_stack) != 0 and prices[v2] < prices[pairs_stack[-1][0]]:
+                v1, p1 = pairs_stack.pop()
+                heapq.heappush(heap, -(prices[p1] - prices[v1]))
+                while len(pairs_stack) != 0 and prices[v2] >= prices[pairs_stack[-1][0]] and prices[p2] >= prices[pairs_stack[-1][1]]:
+                    v1, p1 = pairs_stack[-1]
+                    heapq.heappush(heap, -(prices[p1] - prices[v2]))
+                    v2 = v1
+                    pairs_stack.pop()
+
+            pairs_stack.append((v2, p2))
+
+
         while len(pairs_stack) != 0:
             pairs = pairs_stack.pop()
             heapq.heappush(heap, -(prices[pairs[1]] - prices[pairs[0]]))
