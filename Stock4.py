@@ -79,5 +79,13 @@ class Solution:
 
 if __name__ == '__main__':
     a = Solution()
-    print(a.maxProfit(2, [1, 2, 3, 4, 3, 2, 3, 4, 5, 4]))
+    prices = [48,12,60,93,97,42,25,64,17,56,85,93,9,48,52,42,58,85,81,84,69,36,1,54,23,15,72,15,11,94]
+    print(a.maxProfit(7, [48,12,60,93,97,42,25,64,17,56,85,93,9,48,52,42,58,85,81,84,69,36,1,54,23,15,72,15,11,94]))
     print(a.record.action)
+    current = 0
+    for i in range(len(a.record.action)):
+        if a.record.action[i] == 'b':
+            current -= prices[i]
+        elif a.record.action[i] == 's':
+            current += prices[i]
+    print(current)
