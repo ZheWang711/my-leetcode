@@ -18,12 +18,12 @@ class Solution:
             # lh <= mid < rh
             if matrix[mid][0] > target:
                 rh = mid - 1
-                # rh' = mid - 1 <= rh - 1
+                # rh' = mid - 1 <= rh - 1 < rh
             elif matrix[mid][0] == target:
                 return True
             else:
                 lh = mid
-                # lh' = mid >= lh
+                # lh' = mid >= lh + 1 > lh
         if rh < lh:
             return False
         else:
